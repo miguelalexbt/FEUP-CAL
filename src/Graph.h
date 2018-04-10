@@ -116,6 +116,7 @@ public:
 	void bellman_ford(const T &s);
 	void johnson(const T &s);
 	void a_star(const T &origin, const T &destination);
+	//void floyd_warshall();
 
 	pair<vector<T>, vector<string>> getPath(const T &origin, const T &dest) const;
 };
@@ -324,6 +325,69 @@ void Graph<T>::a_star(const T &origin, const T &destination) {
 		}
 	}
 }
+
+//template <class T>
+//void Graph<T>::floyd_warshall() {
+//
+//	int size = vertexSet.size();
+//	auto dist = vector<vector<double>>(size, vector <double>(size, INF));
+//	auto path = vector<vector<int>>(size, vector <int>(size));
+//
+//	for (size_t i = 0; i < size; i++) {
+//		for (size_t j = 0; j < size; j++) {
+//
+//			find(vertexSet[i]->adj.begin(), vertexSet[i]->adj.end(), 
+//
+//		}
+//		
+//		for (Edge<T> e : vertexSet[i]->adj) {
+//
+//			dist
+//
+//		}
+//
+//
+//
+//	}
+//
+//	Edge<T> * edge;
+//
+//	// atribui-se todas as distancias conhecidas: mesmo vertice ou vertices ligados por uma aresta
+//	for (int i = 0; i < size; i++) {
+//		for (int j = 0; j < size; j++) {
+//
+//			if (i == j)
+//				dist[i][j] = 0;
+//			else {
+//
+//				edge = vertexSet.at(i)->goesToVertex(vertexSet.at(j));
+//
+//				// tal aresta existe
+//				if (edge != nullptr) {
+//					dist[i][j] = edge->weight;
+//					path[i][j] = vertexSet.at;
+//				}
+//				else {
+//					dist[i][j] = INF;
+//					path[i][j] = -1;
+//				}
+//			}
+//
+//		}
+//	}
+//
+//	// verifica-se atraves das distancias ja calculadas a menor distancia entre vertices
+//	for (int k = 0; k < size; k++) {
+//		for (int i = 0; i < size; i++) {
+//			for (int j = 0; j < size; j++) {
+//				if (dist[i][j] > dist[i][k] + dist[k][j]) {
+//					dist[i][j] = dist[i][k] + dist[k][j];
+//					path[i][j] = path[i][k];
+//				}
+//			}
+//		}
+//	}
+//}
 
 template<class T>
 pair<vector<T>, vector<string>> Graph<T>::getPath(const T &origin, const T &dest) const {

@@ -6,8 +6,8 @@
 
 #include <nlohmann/json.hpp>
 
-typedef enum { null, BUS, SUBWAY }		mode_t;
-typedef std::pair<std::string, double>	route_t;
+typedef enum { null, BUS, SUBWAY, WALK }	mode_t;
+typedef std::pair<std::string, double>		route_t;
 
 class Line {
 

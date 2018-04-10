@@ -1,6 +1,6 @@
 #include <conio.h>
 
-#include "Grid.h"
+#include "Database.h"
 #include "Loader.h"
 
 void printHelp();
@@ -9,7 +9,7 @@ int chooseAlgorithm();
 
 int main(int argc, char *argv[]) {
 
-	vector<string> accepted_args{ "-d", "-s", "-t", "-p", "-r" };
+	vector<string> accepted_args{ "-distance", "-stop", "-time", "-price", "-real" };
 
 	vector<string> args;
 	for (int i = 0; i < argc; i++)
@@ -25,9 +25,11 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	int algorithm = chooseAlgorithm();
+	int algorithm;
+	if ((algorithm = chooseAlgorithm()) == -1)
+		return 0;
 
-	Grid g;
+	Database g;
 	g.run(argv[1], argv[2], argv[3], algorithm);
 
 	return 0;
@@ -36,11 +38,11 @@ int main(int argc, char *argv[]) {
 void printHelp() {
 	cout << " Usage: SOURCE DESTINATION [-arg]" << endl << " Use \"-help\" for list of arguments. " << endl;
 	cout << " List of arguments (best path by): " << endl;
-	cout << " Distance: " << setw(8) << "-d" << endl;
-	cout << " Less stops: " << setw(6) << "-s" << endl;
-	cout << " Time: " << setw(12) << "-t" << endl;
-	cout << " Price: " << setw(11) << "-p" << endl;
-	cout << " Realistic path: " << setw(2) << "-r" << endl;
+	cout << " Distance: " << setw(8) << "-distance" << endl;
+	cout << " Less stops: " << setw(6) << "-stop" << endl;
+	cout << " Time: " << setw(12) << "-time" << endl;
+	cout << " Price: " << setw(11) << "-price" << endl;
+	cout << " Realistic path: " << setw(2) << "-real" << endl;
 }
 
 void printAlgorithms() {
@@ -49,6 +51,7 @@ void printAlgorithms() {
 	cout << " [2] Bellman-Ford's algorithm. " << endl;
 	cout << " [3] Johnson's algorithm. " << endl;
 	cout << " [4] A* algorithm. " << endl;
+	cout << " [0] Exit. " << endl;
 }
 
 int chooseAlgorithm() {
@@ -58,7 +61,7 @@ int chooseAlgorithm() {
 	int choice;
 	cin >> choice;
 
-	while (cin.fail() || choice < 0 || choice > 5) {
+	while (cin.fail() || choice < 0 || choice > 4) {
 			
 		cin.clear();
 		cin.ignore();

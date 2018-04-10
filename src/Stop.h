@@ -12,7 +12,7 @@ class Stop {
 
 	std::string	_zone;
 	std::string	_scode;
-	coord_t	_coords;
+	coord_t		_coords;
 
 public:
 

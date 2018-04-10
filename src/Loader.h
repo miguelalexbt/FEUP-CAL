@@ -40,7 +40,7 @@ public:
 
 	void run();
 
-	friend class Grid;
+	friend class Database;
 };
 
 #endif
