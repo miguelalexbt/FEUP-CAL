@@ -10,7 +10,6 @@
 #include <set>
 
 #include "Utils.h"
-#include "Stop.h"
 #include "MutablePriorityQueue.h"
 
 using namespace std;
@@ -273,8 +272,8 @@ void Graph<T>::johnson(const T &s) {
 template<class T>
 void Graph<T>::a_star(const T &origin, const T &destination) {
 
-	auto heuristic_cost_estimate = [](Stop* s1, Stop* s2) {
-		return utils::haversineDistance(s1->getCoords(), s2->getCoords());
+	auto heuristic_cost_estimate = [](T start, T end) {
+		return utils::haversineDistance(start->getCoords(), end->getCoords());
 	};
 
 	set<Vertex<T>*> closedSet;
@@ -285,6 +284,7 @@ void Graph<T>::a_star(const T &origin, const T &destination) {
 		v->dist = INF;
 		v->path = nullptr;
 		v->fScore = INF;
+		v->edge_info = "";
 	}
 
 	auto src = findVertex(origin);

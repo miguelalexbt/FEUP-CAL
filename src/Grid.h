@@ -4,20 +4,29 @@
 /* Max distance a person is willing to walk to another stop */
 #define MAX_WALK_DISTANCE	0.1		/* 100 meters */
 
+/* Speeds for each means of transport */
+#define WALKING_SPEED		5.0		
+#define BUS_SPEED			50.0
+#define TRAIN_SPEED			80.0
+
 /* Penalties for some actions */
 #define NO_PENALTY			1.0		/* no penalty */
 #define ZONE_PENALTY		1.95	/* penalty for entering a new zone */
-#define	ZONE_EXTRA_PENALTY	100		/* unrealistic penalty, used to force Dijsktra to change zones as few times as possible */
+#define	ZONE_EXTRA_PENALTY	100		/* unrealistic penalty, used to force the algorithms to try to change zones as few times as possible */
+#define LINE_EXTRA_PENALTY	100		/* unrealistic penalty, used to force the algorithms to try to change zones as few times as possible */
 
-/* Priorities for each means of transportation (calculations in addEdgesTime) */
-#define BUS_PRIORITY		1.0		/* base speed */
-#define WALKING_PRIORITY	10.0	/* 10 times slower than bus */
-#define SUBWAY_PRIORITY		0.625	/* 1.6 times faster than bus */
+/* Priorities for each means of transport (calculations in addEdgesTime) */
+#define BUS_RATIO			1.0		/* base time */
+#define WALKING_RATIO		10.0	/* 10 times slower than bus */
+#define SUBWAY_RATIO		0.625	/* 1.6 times faster than bus */
 
-/* Weights for each type of constraints */
-#define DISTANCE_WEIGHT		0.4
-#define TIME_WEIGHT			0.3			
-#define PRICE_WEIGHT		0.3
+/* Time a bus takes */
+#define BUS_TIME(d)			(d / BUS_SPEED)
+
+/* Priorities for each type of weights */
+#define DIST_PRIORITY		0.25
+#define TIME_PRIORITY		0.5			
+#define PRIC_PRIORITY		0.25
 
 #include <iostream>
 #include <fstream>
@@ -42,12 +51,12 @@ public:
 
 		load();
 
-		generateGraph(option);
-
 		if (_loader._stops.find(start) == _loader._stops.end() || _loader._stops.find(end) == _loader._stops.end()) {
 			cerr << " [ERROR]: invalid stop(s). " << endl;
 			return;
 		}
+
+		generateGraph(option);
 
 		runAlgorithm(start, end, algorithm);
 
@@ -137,7 +146,7 @@ public:
 			if (edges[i + 1] == "walk")
 				cout << ", walking." << endl;
 			else
-				cout << ", through " << edges[i + 1] << "." << endl;
+				cout << ", through " << edges[i + 1] << " (" << nodes[i]->getZone() << "->" << nodes[i + 1]->getZone() << ")." << endl;
 		}
 	}
 
@@ -220,7 +229,7 @@ public:
 		Reasoning behind the values SUBWAY_PRIORITY AND WALKING_PRIORITY:
 
 		> Formula :
-			-> v = d / t, therefore t = d / v.
+			-> v = d / t <=> t = d / v.
 
 		> Considering the speed of a bus as 50 km/h, the speed of a train as 80 km/h and the speed of a person as 5km/h:
 			-> A subway is 1.6 times faster than the bus;
@@ -231,12 +240,21 @@ public:
 			-> vT = d / tT <=> 1.6 * vB = d / tT <=> 1.6 * (d / tB) = d / tT <=> 1.6 / tB = 1 / tT <=>
 				<=> tT = (1 / 1.6) * tB <=> tT = 0.625 * tB
 			-> vP = d / tP <=> 0.1 * vB = d / tP <=> 0.1 * (d / tB) = d / tP <=> 0.1 / tB = 1 / tP <=>
-				<=> tP = (1 / 0.1) * tB <=> tT = 10 * tB
+				<=> tP = (1 / 0.1) * tB <=> tP = 10 * tB
+
+		> Therefore:
+			-> SUBWAY_PRIORITY = 0.625 (it takes 0.625 times less to make d kilometers)
+			-> WALKING_PRIORITY = 10 (it takes 10 times more to make d kilometers)
 
 		> Conclusion:
-			-> SUBWAY_PRIORITY = 0.625
-			-> WALKING_PRIORITY = 10
+			-> We can calculate tB: tB = d / 50.0
+			-> Then we get tT: tT = 0.625 * tB
+			-> And we get tP: tP = 10 * tB
 		*/
+
+		auto time_calculator = [](double ratio, double distance) {
+			return ratio * (distance / BUS_SPEED);
+		};
 
 		//Add walking edges
 		for (auto src = _loader._stops.begin(); src != _loader._stops.end(); src++) {
@@ -246,7 +264,7 @@ public:
 				double distance = utils::haversineDistance((*src).second.getCoords(), (*dst).second.getCoords());
 
 				if (distance <= MAX_WALK_DISTANCE)
-					connect2way((*src).first, (*dst).first, WALKING_PRIORITY * distance);
+					connect2way((*src).first, (*dst).first, time_calculator(WALKING_RATIO, distance));
 			}
 		}
 
@@ -259,13 +277,14 @@ public:
 				for (size_t i = 0; i < routeA.size() - 1; i++) {
 
 					double distance = routeA[i].second;
+					double time;
 
 					if ((*it).second.getMode() == SUBWAY)
-						distance *= SUBWAY_PRIORITY;
+						time = time_calculator(SUBWAY_RATIO, distance);
 					else
-						distance *= BUS_PRIORITY;
+						time = time_calculator(BUS_RATIO, distance);
 
-					connect(routeA[i].first, routeA[i + 1].first, (*it).first, distance);
+					connect(routeA[i].first, routeA[i + 1].first, (*it).first, time);
 				}
 			}
 
@@ -275,11 +294,12 @@ public:
 				for (size_t i = 0; i < routeD.size() - 1; i++) {
 
 					double distance = routeD[i].second;
+					double time;
 
 					if ((*it).second.getMode() == SUBWAY)
-						distance *= SUBWAY_PRIORITY;
+						time = time_calculator(SUBWAY_RATIO, distance);
 					else
-						distance *= BUS_PRIORITY;
+						time = time_calculator(BUS_RATIO, distance);
 					
 					connect(routeD[i].first, routeD[i + 1].first, (*it).first, distance);
 				}
@@ -347,6 +367,15 @@ public:
 
 	void addEdgesReal() {
 
+		auto applyModifiers= [](double distance, vector<double> modifiers) {
+
+			double dist_weight = DIST_PRIORITY * distance;
+			double time_weight = TIME_PRIORITY * (modifiers[0] * (distance / BUS_SPEED));
+			double pric_weight = PRIC_PRIORITY * (modifiers[1] * distance);
+
+			return dist_weight + time_weight + pric_weight;
+		};
+
 		//Add walking edges
 		for (auto src = _loader._stops.begin(); src != _loader._stops.end(); src++) {
 
@@ -356,7 +385,7 @@ public:
 
 				if (distance <= MAX_WALK_DISTANCE) {
 					
-					vector<double> modifiers{ WALKING_PRIORITY };
+					vector<double> modifiers{ WALKING_RATIO };
 
 					if ((*src).second.getZone() != (*dst).second.getZone())
 						modifiers.push_back(ZONE_PENALTY);
@@ -380,9 +409,9 @@ public:
 					vector<double> modifiers;
 
 					if ((*it).second.getMode() == SUBWAY)
-						modifiers.push_back(SUBWAY_PRIORITY);
+						modifiers.push_back(SUBWAY_RATIO);
 					else
-						modifiers.push_back(BUS_PRIORITY);
+						modifiers.push_back(BUS_RATIO);
 
 					if (_loader._stops[routeA[i].first].getZone() != _loader._stops[routeA[i + 1].first].getZone())
 						modifiers.push_back(ZONE_PENALTY);
@@ -402,9 +431,9 @@ public:
 					vector<double> modifiers;
 
 					if ((*it).second.getMode() == SUBWAY)
-						modifiers.push_back(SUBWAY_PRIORITY);
+						modifiers.push_back(SUBWAY_RATIO);
 					else
-						modifiers.push_back(BUS_PRIORITY);
+						modifiers.push_back(BUS_RATIO);
 
 					if (_loader._stops[routeD[i].first].getZone() != _loader._stops[routeD[i + 1].first].getZone())
 						modifiers.push_back(ZONE_PENALTY);
@@ -415,15 +444,6 @@ public:
 				}
 			}
 		}
-	}
-
-	double applyModifiers(double distance, vector<double> modifiers) {
-
-		double distance_weight = DISTANCE_WEIGHT * distance;
-		double time_weight = TIME_WEIGHT * (modifiers[0] * distance);
-		double price_weight = PRICE_WEIGHT * (modifiers[1] * distance);
-
-		return distance_weight + time_weight + price_weight;
 	}
 
 	void connect(string stop_src, string stop_dst, string line, double weight) {
