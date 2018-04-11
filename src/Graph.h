@@ -10,104 +10,23 @@
 #include <set>
 
 #include "Utils.h"
+#include "Vertex.h"
+#include "Edge.h"
 #include "MutablePriorityQueue.h"
-
-using namespace std;
-
-template <class T> class Edge;
-template <class T> class Graph;
-template <class T> class Vertex;
 
 #undef max
 #define INF std::numeric_limits<double>::max()
 
-/************************* Vertex  **************************/
-
-template <class T>
-class Vertex {
-	T info;                // contents
-	vector<Edge<T> > adj;  // outgoing edges
-	bool visited;          // auxiliary field
-	double dist = 0;
-	Vertex<T> *path = NULL;
-	double fScore;
-	string edge_info = "";
-	int queueIndex = 0; 		// required by MutablePriorityQueue
-
-	bool processing = false;
-	void addEdge(Vertex<T> *dest, string o, double w);
-
-public:
-	Vertex(T in);
-	bool operator<(Vertex<T> & vertex) const; // // required by MutablePriorityQueue
-	T getInfo() const;
-	double getDist() const;
-	Vertex *getPath() const;
-	friend class Graph<T>;
-	friend class MutablePriorityQueue<Vertex<T>>;
-};
-
-template <class T>
-Vertex<T>::Vertex(T in) : info(in) {}
-
-/*
-* Auxiliary function to add an outgoing edge to a vertex (this),
-* with a given destination vertex (d) and edge weight (w).
-*/
-template <class T>
-void Vertex<T>::addEdge(Vertex<T> *d, string o, double w) {
-	adj.push_back(Edge<T>(o, d, w));
-}
-
-template <class T>
-bool Vertex<T>::operator<(Vertex<T> & vertex) const {
-	return this->dist < vertex.dist;
-}
-
-template <class T>
-T Vertex<T>::getInfo() const {
-	return this->info;
-}
-
-template <class T>
-double Vertex<T>::getDist() const {
-	return this->dist;
-}
-
-template <class T>
-Vertex<T> *Vertex<T>::getPath() const {
-	return this->path;
-}
-
-/********************** Edge  ****************************/
-
-template <class T>
-class Edge {
-	string owner;			// owner (line)
-	Vertex<T> * dest;      // destination vertex
-	double weight;         // edge weight
-public:
-	Edge(string o, Vertex<T> *d, double w);
-	friend class Graph<T>;
-	friend class Vertex<T>;
-};
-
-template <class T>
-Edge<T>::Edge(string o, Vertex<T> *d, double w) : owner(o), dest(d), weight(w) {}
-
-
-/*************************** Graph  **************************/
-
 template <class T>
 class Graph {
-	vector<Vertex<T> *> vertexSet;    // vertex set
+	std::vector<Vertex<T> *> vertexSet;    // vertex set
 
 public:
 	Vertex<T> *findVertex(const T &in) const;
 	bool addVertex(const T &in);
-	bool addEdge(const T &sourc, const T &dest, string o, double w);
+	bool addEdge(const T &sourc, const T &dest, std::string o, double w);
 	int getNumVertex() const;
-	vector<Vertex<T> *> getVertexSet() const;
+	std::vector<Vertex<T> *> getVertexSet() const;
 
 	Vertex<T> * initSingleSource(const T &origin);
 	bool relax(Vertex<T> *v, Vertex<T> *w, Edge<T> e);
@@ -116,9 +35,8 @@ public:
 	void bellman_ford(const T &s);
 	void johnson(const T &s);
 	void a_star(const T &origin, const T &destination);
-	//void floyd_warshall();
 
-	pair<vector<T>, vector<string>> getPath(const T &origin, const T &dest) const;
+	std::pair<std::vector<T>, std::vector<std::string>> getPath(const T &origin, const T &dest) const;
 };
 
 template <class T>
@@ -127,7 +45,7 @@ int Graph<T>::getNumVertex() const {
 }
 
 template <class T>
-vector<Vertex<T> *> Graph<T>::getVertexSet() const {
+std::vector<Vertex<T> *> Graph<T>::getVertexSet() const {
 	return vertexSet;
 }
 
@@ -160,7 +78,7 @@ bool Graph<T>::addVertex(const T &in) {
 * Returns true if successful, and false if the source or destination vertex does not exist.
 */
 template <class T>
-bool Graph<T>::addEdge(const T &sourc, const T &dest, string o, double w) {
+bool Graph<T>::addEdge(const T &sourc, const T &dest, std::string o, double w) {
 	auto v1 = findVertex(sourc);
 	auto v2 = findVertex(dest);
 	if (v1 == NULL || v2 == NULL)
@@ -169,7 +87,7 @@ bool Graph<T>::addEdge(const T &sourc, const T &dest, string o, double w) {
 	return true;
 }
 
-/**************** Single Source Shortest Path algorithms ************/
+/**************** Single Source Shortest Path Algorithms ************/
 
 template<class T>
 Vertex<T> * Graph<T>::initSingleSource(const T &origin) {
@@ -326,75 +244,12 @@ void Graph<T>::a_star(const T &origin, const T &destination) {
 	}
 }
 
-//template <class T>
-//void Graph<T>::floyd_warshall() {
-//
-//	int size = vertexSet.size();
-//	auto dist = vector<vector<double>>(size, vector <double>(size, INF));
-//	auto path = vector<vector<int>>(size, vector <int>(size));
-//
-//	for (size_t i = 0; i < size; i++) {
-//		for (size_t j = 0; j < size; j++) {
-//
-//			find(vertexSet[i]->adj.begin(), vertexSet[i]->adj.end(), 
-//
-//		}
-//		
-//		for (Edge<T> e : vertexSet[i]->adj) {
-//
-//			dist
-//
-//		}
-//
-//
-//
-//	}
-//
-//	Edge<T> * edge;
-//
-//	// atribui-se todas as distancias conhecidas: mesmo vertice ou vertices ligados por uma aresta
-//	for (int i = 0; i < size; i++) {
-//		for (int j = 0; j < size; j++) {
-//
-//			if (i == j)
-//				dist[i][j] = 0;
-//			else {
-//
-//				edge = vertexSet.at(i)->goesToVertex(vertexSet.at(j));
-//
-//				// tal aresta existe
-//				if (edge != nullptr) {
-//					dist[i][j] = edge->weight;
-//					path[i][j] = vertexSet.at;
-//				}
-//				else {
-//					dist[i][j] = INF;
-//					path[i][j] = -1;
-//				}
-//			}
-//
-//		}
-//	}
-//
-//	// verifica-se atraves das distancias ja calculadas a menor distancia entre vertices
-//	for (int k = 0; k < size; k++) {
-//		for (int i = 0; i < size; i++) {
-//			for (int j = 0; j < size; j++) {
-//				if (dist[i][j] > dist[i][k] + dist[k][j]) {
-//					dist[i][j] = dist[i][k] + dist[k][j];
-//					path[i][j] = path[i][k];
-//				}
-//			}
-//		}
-//	}
-//}
-
 template<class T>
-pair<vector<T>, vector<string>> Graph<T>::getPath(const T &origin, const T &dest) const {
+std::pair<std::vector<T>, std::vector<std::string>> Graph<T>::getPath(const T &origin, const T &dest) const {
 
-	pair<vector<T>, vector<string>> res;
-	vector<T> nodes;
-	vector<string> edges;
+	std::pair<std::vector<T>, std::vector<std::string>> res;
+	std::vector<T> nodes;
+	std::vector<std::string> edges;
 
 	auto v = findVertex(dest);
 
@@ -406,8 +261,8 @@ pair<vector<T>, vector<string>> Graph<T>::getPath(const T &origin, const T &dest
 		edges.push_back(v->edge_info);
 	}
 
-	reverse(nodes.begin(), nodes.end());
-	reverse(edges.begin(), edges.end());
+	std::reverse(nodes.begin(), nodes.end());
+	std::reverse(edges.begin(), edges.end());
 
 	res.first = nodes;
 	res.second = edges;

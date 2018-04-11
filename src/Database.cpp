@@ -190,7 +190,7 @@ double Database::_applyModifiers(int option, string start, string end, double we
 
 	//Option
 	//0 -> distance
-	//1 -> changes
+	//1 -> stop
 	//2 -> time
 	//3 -> price
 	//4 -> real
@@ -217,7 +217,7 @@ double Database::_applyModifiers(int option, string start, string end, double we
 			+ TIME_PRIORITY * _applyModifiers(2, start, end, weight, mode)
 			+ PRIC_PRIORITY * _applyModifiers(3, start, end, weight, mode);
 	default:
-		return 0;
+		throw runtime_error("Criteria doesn't exist.");
 	}
 }
 

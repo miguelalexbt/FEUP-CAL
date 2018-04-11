@@ -1,7 +1,8 @@
 #include <conio.h>
 
 #include "Database.h"
-#include "Loader.h"
+
+using namespace std;
 
 void printHelp();
 void printAlgorithms(); 
@@ -20,7 +21,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	if (find(accepted_args.begin(), accepted_args.end(), argv[3]) == accepted_args.end()) {
+	if (find(accepted_args.begin(), accepted_args.end(), args[3]) == accepted_args.end()) {
 		cerr << " [ERROR]: unknown argument. " << endl;
 		return 1;
 	}
@@ -30,7 +31,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 
 	Database g;
-	g.run(argv[1], argv[2], argv[3], algorithm);
+	g.run(args[1], args[2], args[3], algorithm);
 
 	return 0;
 }
@@ -46,12 +47,14 @@ void printHelp() {
 }
 
 void printAlgorithms() {
+
 	cout << endl << " Choose one of the algorithm: " << endl;
 	cout << " [1] Dijkstra's algorithm. " << endl;
 	cout << " [2] Bellman-Ford's algorithm. " << endl;
 	cout << " [3] Johnson's algorithm. " << endl;
 	cout << " [4] A* algorithm. " << endl;
 	cout << " [0] Exit. " << endl;
+	cout << " Input : ";
 }
 
 int chooseAlgorithm() {

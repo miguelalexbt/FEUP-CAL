@@ -49,7 +49,7 @@ class Database {
 	 *	@param distance Initial weight.
 	 *	@param mode Traveling mode. 
 	 *	@return Returns the modified weight. */
-	double _applyModifiers(int option, string start, string end, double distance, mode_t mode);
+	double _applyModifiers(int option, std::string start, std::string end, double distance, mode_t mode);
 
 	/** Connects two stops, adding an one-way edge between them.
 	 *	@param stop_src Starting stop.

@@ -11,22 +11,19 @@
 
 #include <vector>
 
-
-using namespace std;
-
 /**
 * class T must have: (i) accessible field int queueIndex; (ii) operator< defined.
 */
 
 template <class T>
 class MutablePriorityQueue {
-	vector<T *> H;
+	std::vector<T *> H;
 	void heapifyUp(unsigned i);
 	void heapifyDown(unsigned i);
 	inline void set(unsigned i, T * x);
 public:
 	MutablePriorityQueue();
-	vector<T *> getHeap() const;
+	std::vector<T *> getHeap() const;
 	void insert(T * x);
 	T * extractMin();
 	void decreaseKey(T * x);
@@ -105,7 +102,7 @@ void MutablePriorityQueue<T>::set(unsigned i, T * x) {
 }
 
 template <class T>
-vector<T *> MutablePriorityQueue<T>::getHeap() const {
+std::vector<T *> MutablePriorityQueue<T>::getHeap() const {
 	return H;
 }
 #endif /* SRC_MUTABLEPRIORITYQUEUE_H_ */
