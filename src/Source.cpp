@@ -37,12 +37,12 @@ int main(int argc, char *argv[]) {
 }
 
 void printHelp() {
-	cout << " Usage: SOURCE DESTINATION [-arg]" << endl << " Use \"-help\" for list of arguments. " << endl;
+	cout << endl << " Usage: [SOURCE] [DESTINATION] [-ARGS]" << endl;
 	cout << " List of arguments (best path by): " << endl;
-	cout << " Distance: " << setw(8) << "-distance" << endl;
-	cout << " Less stops: " << setw(6) << "-stop" << endl;
-	cout << " Time: " << setw(12) << "-time" << endl;
-	cout << " Price: " << setw(11) << "-price" << endl;
+	cout << " Distance: " << setw(15) << "-distance" << endl;
+	cout << " Less stops: " << setw(9) << "-stop" << endl;
+	cout << " Time: " << setw(15) << "-time" << endl;
+	cout << " Price: " << setw(15) << "-price" << endl;
 	cout << " Realistic path: " << setw(2) << "-real" << endl;
 }
 
