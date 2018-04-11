@@ -18,6 +18,8 @@
 
 #include "Database.h"
 
+#include <vector>
+
 using namespace std;
 
 void Database::run(string start, string end, string option, int algorithm) {
@@ -35,7 +37,9 @@ void Database::run(string start, string end, string option, int algorithm) {
 
 	_parseResults(_graph.getPath(&_loader._stops[start], &_loader._stops[end]));
 
-	cout << "\n Press any key to exit... " << endl;
+	_showGraph(_graph.getPath(&_loader._stops[start], &_loader._stops[end]).first);
+
+	cout << " Press any key to exit... " << endl;
 	_getch();
 }
 
@@ -112,6 +116,11 @@ void Database::_parseResults(pair<vector<Stop*>, vector<string>> path) {
 	auto nodes = path.first;
 	auto edges = path.second;
 
+	if (nodes.empty()) {
+		cout << " No path from source stop to destination stop. " << endl;
+		return;
+	}
+
 	for (size_t i = 0; i < nodes.size() - 1; i++) {
 
 		cout << " " << nodes[i]->getCode() << " to " << nodes[i + 1]->getCode();
@@ -120,6 +129,25 @@ void Database::_parseResults(pair<vector<Stop*>, vector<string>> path) {
 			cout << ", walking." << endl;
 		else
 			cout << ", through " << edges[i + 1] << " (" << nodes[i]->getZone() << "->" << nodes[i + 1]->getZone() << ")." << endl;
+	}
+}
+
+void Database::_showGraph(vector<Stop*> path) {
+
+	cout << "\n Show graph? (s/n) ";
+
+	char choice;
+	cin >> choice;
+
+	if (cin.fail()) {
+		cin.clear();
+		cin.ignore();
+		return;
+	}
+	else if (choice == 's') {
+		Viewer v(&_graph);
+		v.showGraph();
+		v.showPath(path);
 	}
 }
 

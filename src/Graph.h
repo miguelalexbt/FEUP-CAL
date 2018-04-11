@@ -22,6 +22,7 @@ class Graph {
 	std::vector<Vertex<T> *> vertexSet;    // vertex set
 
 public:
+
 	Vertex<T> *findVertex(const T &in) const;
 	bool addVertex(const T &in);
 	bool addEdge(const T &sourc, const T &dest, std::string o, double w);
@@ -269,5 +270,6 @@ std::pair<std::vector<T>, std::vector<std::string>> Graph<T>::getPath(const T &o
 
 	return res;
 }
+
 
 #endif /* GRAPH_H_ */

@@ -10,16 +10,15 @@ template <class T> class MutablePriorityQueue;
 
 template <class T>
 class Vertex {
-	T info;                // contents
-	std::vector<Edge<T> > adj;  // outgoing edges
-	bool visited;          // auxiliary field
+	T info;						// contents
+	std::vector<Edge<T>> adj;  // outgoing edges
+	bool visited;				// auxiliary field
 	double dist = 0;
 	Vertex<T> *path = NULL;
 	double fScore;
 	std::string edge_info = "";
 	int queueIndex = 0; 		// required by MutablePriorityQueue
 
-	bool processing = false;
 	void addEdge(Vertex<T> *dest, std::string o, double w);
 
 public:
@@ -28,6 +27,7 @@ public:
 	T getInfo() const;
 	double getDist() const;
 	Vertex *getPath() const;
+	std::vector<Edge<T>> getAdj() const;
 
 	friend class Graph<T>;
 	friend class MutablePriorityQueue<Vertex<T>>;
@@ -63,6 +63,11 @@ double Vertex<T>::getDist() const {
 template <class T>
 Vertex<T> *Vertex<T>::getPath() const {
 	return this->path;
+}
+
+template <class T>
+std::vector<Edge<T>> Vertex<T>::getAdj() const {
+	return adj;
 }
 
 #endif

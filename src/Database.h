@@ -8,6 +8,7 @@
 
 #include "Graph.h"
 #include "Loader.h"
+#include "Viewer.h"
 
 /** Class responsible for generating a graph and running the algorithms. */
 class Database {
@@ -34,6 +35,10 @@ class Database {
 	/** Parse the results from running the algorithm and displays it, in an user-friendly way.
 	 *	@param path Best shortest path calculated by the algorithm. */
 	void _parseResults(std::pair<std::vector<Stop*>, std::vector<std::string>> path);
+
+	/** Shows the path in the GraphViewer.
+	 *	@param path Path found.*/
+	void _showGraph(std::vector<Stop*> path);
 
 	/** Adds vertices to the graph. */
 	void _addVertices();
