@@ -53,7 +53,7 @@ public:
 
 			auto vertice = _g->getVertexSet()[i];
 
-			double x = (vertice->getInfo()->getCoords().first - lonMin) * (hor_res / (lonMax - lonMin));
+			double x = hor_res - (vertice->getInfo()->getCoords().first - lonMin) * (hor_res / (lonMax - lonMin));
 			double y = vert_res - (vertice->getInfo()->getCoords().second - latMin) * (vert_res / (latMax - latMin));
 
 			_gv->addNode(i, (int)x, (int)y);
