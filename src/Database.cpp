@@ -3,18 +3,13 @@
 #define MAX_WALK_DISTANCE	0.1		/* 100 meters */
 
 /* Speeds for each means of transport */
-#define WALKING_SPEED		5.0		
-#define BUS_SPEED			50.0
-#define TRAIN_SPEED			80.0
+#define WALKING_SPEED		5.0		/* 5 km/h */
+#define BUS_SPEED			50.0	/* 50 km/h */
+#define SUBWAY_SPEED		80.0	/* 80 km/h */
 
 /* Penalties for some actions */
 #define NO_PENALTY			1.0		/* no penalty */
 #define ZONE_PENALTY		1.95	/* penalty for entering a new zone */
-
-/* Priorities for each means of transport (calculations in addEdgesTime) */
-#define BUS_RATIO			1.0		/* base time */
-#define WALKING_RATIO		10.0	/* 10 times slower than bus */
-#define SUBWAY_RATIO		0.625	/* 1.6 times faster than bus */
 
 /* Priorities for each type of weights */
 #define DIST_PRIORITY		0.25
@@ -183,299 +178,10 @@ void Database::_addEdges(int option) {
 	}
 }
 
-//void Database::_addEdgesDistance() {
-//
-//	//Add walking edges
-//	for (auto src = _loader._stops.begin(); src != _loader._stops.end(); src++) {
-//
-//		for (auto dst = next(src, 1); dst != _loader._stops.end(); dst++) {
-//
-//			double distance = utils::haversineDistance((*src).second.getCoords(), (*dst).second.getCoords());
-//
-//			if (distance <= MAX_WALK_DISTANCE)
-//				_connect2way((*src).first, (*dst).first, distance);
-//		}
-//	}
-//
-//	//Add line's routes
-//	for (auto it = _loader._lines.begin(); it != _loader._lines.end(); it++) {
-//
-//		vector<route_t> routeA = (*it).second.getRoute(0);
-//
-//		if (routeA.size() > 0) {
-//			for (size_t i = 0; i < routeA.size() - 1; i++)
-//				_connect(routeA[i].first, routeA[i + 1].first, (*it).first, routeA[i].second);
-//		}
-//
-//		vector<route_t> routeD = (*it).second.getRoute(1);
-//
-//		if (routeD.size() > 0) {
-//			for (size_t i = 0; i < routeD.size() - 1; i++)
-//				_connect(routeD[i].first, routeD[i + 1].first, (*it).first, routeD[i].second);
-//		}
-//	}
-//}
-//
-//void Database::_addEdgesChanges() {
-//
-//	//Add walking edges
-//	for (auto src = _loader._stops.begin(); src != _loader._stops.end(); src++) {
-//
-//		for (auto dst = next(src, 1); dst != _loader._stops.end(); dst++) {
-//
-//			double distance = utils::haversineDistance((*src).second.getCoords(), (*dst).second.getCoords());
-//
-//			if (distance <= MAX_WALK_DISTANCE)
-//				_connect2way((*src).first, (*dst).first, 1);
-//		}
-//	}
-//
-//	//Add line's routes
-//	for (auto it = _loader._lines.begin(); it != _loader._lines.end(); it++) {
-//
-//		vector<route_t> routeA = (*it).second.getRoute(0);
-//
-//		if (routeA.size() > 0) {
-//			for (size_t i = 0; i < routeA.size() - 1; i++)
-//				_connect(routeA[i].first, routeA[i + 1].first, (*it).first, 1);
-//		}
-//
-//		vector<route_t> routeD = (*it).second.getRoute(1);
-//
-//		if (routeD.size() > 0) {
-//			for (size_t i = 0; i < routeD.size() - 1; i++)
-//				_connect(routeD[i].first, routeD[i + 1].first, (*it).first, 1);
-//		}
-//	}
-//}
-//
-//void Database::_addEdgesTime() {
-//
-//	/*
-//	Reasoning behind the values SUBWAY_PRIORITY AND WALKING_PRIORITY:
-//
-//	> Formula :
-//	-> v = d / t <=> t = d / v.
-//
-//	> Considering the speed of a bus as 50 km/h, the speed of a train as 80 km/h and the speed of a person as 5km/h:
-//	-> A subway is 1.6 times faster than the bus;
-//	-> A person is 10 times slower than the bus.
-//
-//	> With this we can calculate:
-//	-> vB = d / tB <=> tB = d / vB
-//	-> vT = d / tT <=> 1.6 * vB = d / tT <=> 1.6 * (d / tB) = d / tT <=> 1.6 / tB = 1 / tT <=>
-//	<=> tT = (1 / 1.6) * tB <=> tT = 0.625 * tB
-//	-> vP = d / tP <=> 0.1 * vB = d / tP <=> 0.1 * (d / tB) = d / tP <=> 0.1 / tB = 1 / tP <=>
-//	<=> tP = (1 / 0.1) * tB <=> tP = 10 * tB
-//
-//	> Therefore:
-//	-> SUBWAY_PRIORITY = 0.625 (it takes 0.625 times less to make d kilometers)
-//	-> WALKING_PRIORITY = 10 (it takes 10 times more to make d kilometers)
-//
-//	> Conclusion:
-//	-> We can calculate tB: tB = d / 50.0
-//	-> Then we get tT: tT = 0.625 * tB
-//	-> And we get tP: tP = 10 * tB
-//	*/
-//
-//	auto time_calculator = [](double ratio, double distance) {
-//		return ratio * (distance / BUS_SPEED);
-//	};
-//
-//	//Add walking edges
-//	for (auto src = _loader._stops.begin(); src != _loader._stops.end(); src++) {
-//
-//		for (auto dst = next(src, 1); dst != _loader._stops.end(); dst++) {
-//
-//			double distance = utils::haversineDistance((*src).second.getCoords(), (*dst).second.getCoords());
-//
-//			if (distance <= MAX_WALK_DISTANCE)
-//				((*src).first, (*dst).first, time_calculator(WALKING_RATIO, distance));
-//		}
-//	}
-//
-//	//Add line's routes
-//	for (auto it = _loader._lines.begin(); it != _loader._lines.end(); it++) {
-//
-//		vector<route_t> routeA = (*it).second.getRoute(0);
-//
-//		if (routeA.size() > 0) {
-//			for (size_t i = 0; i < routeA.size() - 1; i++) {
-//
-//				double distance = routeA[i].second;
-//				double time;
-//
-//				if ((*it).second.getMode() == SUBWAY)
-//					time = time_calculator(SUBWAY_RATIO, distance);
-//				else
-//					time = time_calculator(BUS_RATIO, distance);
-//
-//				_connect(routeA[i].first, routeA[i + 1].first, (*it).first, time);
-//			}
-//		}
-//
-//		vector<route_t> routeD = (*it).second.getRoute(1);
-//
-//		if (routeD.size() > 0) {
-//			for (size_t i = 0; i < routeD.size() - 1; i++) {
-//
-//				double distance = routeD[i].second;
-//				double time;
-//
-//				if ((*it).second.getMode() == SUBWAY)
-//					time = time_calculator(SUBWAY_RATIO, distance);
-//				else
-//					time = time_calculator(BUS_RATIO, distance);
-//
-//				_connect(routeD[i].first, routeD[i + 1].first, (*it).first, distance);
-//			}
-//		}
-//	}
-//}
-//
-//void Database::_addEdgesPrice() {
-//
-//	//Add walking edges
-//	for (auto src = _loader._stops.begin(); src != _loader._stops.end(); src++) {
-//
-//		for (auto dst = next(src, 1); dst != _loader._stops.end(); dst++) {
-//
-//			double distance = utils::haversineDistance((*src).second.getCoords(), (*dst).second.getCoords());
-//
-//			if (distance <= MAX_WALK_DISTANCE) {
-//
-//				if ((*src).second.getZone() != (*dst).second.getZone())
-//					distance *= ZONE_EXTRA_PENALTY;
-//				else
-//					distance *= NO_PENALTY;
-//
-//				_connect2way((*src).first, (*dst).first, distance);
-//			}
-//		}
-//	}
-//
-//	//Add line's routes
-//	for (auto it = _loader._lines.begin(); it != _loader._lines.end(); it++) {
-//
-//		vector<route_t> routeA = (*it).second.getRoute(0);
-//
-//		if (routeA.size() > 0) {
-//			for (size_t i = 0; i < routeA.size() - 1; i++) {
-//
-//				double distance = routeA[i].second;
-//
-//				if (_loader._stops[routeA[i].first].getZone() != _loader._stops[routeA[i + 1].first].getZone())
-//					distance *= ZONE_EXTRA_PENALTY;
-//				else
-//					distance *= NO_PENALTY;
-//
-//				_connect(routeA[i].first, routeA[i + 1].first, (*it).first, distance);
-//			}
-//		}
-//
-//		vector<route_t> routeD = (*it).second.getRoute(1);
-//
-//		if (routeD.size() > 0) {
-//			for (size_t i = 0; i < routeD.size() - 1; i++) {
-//
-//				double distance = routeD[i].second;
-//
-//				if (_loader._stops[routeD[i].first].getZone() != _loader._stops[routeD[i + 1].first].getZone())
-//					distance *= ZONE_EXTRA_PENALTY;
-//				else
-//					distance *= NO_PENALTY;
-//
-//				_connect(routeD[i].first, routeD[i + 1].first, (*it).first, distance);
-//			}
-//		}
-//	}
-//}
-
-//void Database::_addEdgesReal() {
-//
-//	auto applyModifiers = [](double distance, vector<double> modifiers) {
-//
-//		double dist_weight = DIST_PRIORITY * distance;
-//		double time_weight = TIME_PRIORITY * (modifiers[0] * (distance / BUS_SPEED));
-//		double pric_weight = PRIC_PRIORITY * (modifiers[1] * distance);
-//
-//		return dist_weight + time_weight + pric_weight;
-//	};
-//
-//	//Add walking edges
-//	for (auto src = _loader._stops.begin(); src != _loader._stops.end(); src++) {
-//
-//		for (auto dst = next(src, 1); dst != _loader._stops.end(); dst++) {
-//
-//			double distance = utils::haversineDistance((*src).second.getCoords(), (*dst).second.getCoords());
-//
-//			if (distance <= MAX_WALK_DISTANCE) {
-//
-//				vector<double> modifiers{ WALKING_RATIO };
-//
-//				if ((*src).second.getZone() != (*dst).second.getZone())
-//					modifiers.push_back(ZONE_PENALTY);
-//				else
-//					modifiers.push_back(NO_PENALTY);
-//
-//				_connect2way((*src).first, (*dst).first, applyModifiers(distance, modifiers));
-//			}
-//		}
-//	}
-//
-//	//Add line's routes
-//	for (auto it = _loader._lines.begin(); it != _loader._lines.end(); it++) {
-//
-//		vector<route_t> routeA = (*it).second.getRoute(0);
-//
-//		if (routeA.size() > 0) {
-//			for (size_t i = 0; i < routeA.size() - 1; i++) {
-//
-//				double distance = routeA[i].second;
-//				vector<double> modifiers;
-//
-//				if ((*it).second.getMode() == SUBWAY)
-//					modifiers.push_back(SUBWAY_RATIO);
-//				else
-//					modifiers.push_back(BUS_RATIO);
-//
-//				if (_loader._stops[routeA[i].first].getZone() != _loader._stops[routeA[i + 1].first].getZone())
-//					modifiers.push_back(ZONE_PENALTY);
-//				else
-//					modifiers.push_back(NO_PENALTY);
-//
-//				_connect(routeA[i].first, routeA[i + 1].first, (*it).first, applyModifiers(distance, modifiers));
-//			}
-//		}
-//
-//		vector<route_t> routeD = (*it).second.getRoute(1);
-//
-//		if (routeD.size() > 0) {
-//			for (size_t i = 0; i < routeD.size() - 1; i++) {
-//
-//				double distance = routeD[i].second;
-//				vector<double> modifiers;
-//
-//				if ((*it).second.getMode() == SUBWAY)
-//					modifiers.push_back(SUBWAY_RATIO);
-//				else
-//					modifiers.push_back(BUS_RATIO);
-//
-//				if (_loader._stops[routeD[i].first].getZone() != _loader._stops[routeD[i + 1].first].getZone())
-//					modifiers.push_back(ZONE_PENALTY);
-//				else
-//					modifiers.push_back(NO_PENALTY);
-//
-//				_connect(routeD[i].first, routeD[i + 1].first, (*it).first, applyModifiers(distance, modifiers));
-//			}
-//		}
-//	}
-//}
-
 double Database::_applyModifiers(int option, string start, string end, double weight, mode_t mode) {
 
-	auto time_calculator = [](double ratio, double distance) {
-		return ratio * (distance / BUS_SPEED);
+	auto time = [](double speed, double distance) {
+		return distance / speed;
 	};
 
 	auto same_zone = [](Stop start, Stop end) {
@@ -496,11 +202,11 @@ double Database::_applyModifiers(int option, string start, string end, double we
 		return 1;
 	case 2:
 		if (mode == WALK)
-			return time_calculator(WALKING_RATIO, weight);
+			return time(WALKING_SPEED, weight);
 		else if (mode == SUBWAY)
-			return time_calculator(SUBWAY_RATIO, weight);
+			return time(SUBWAY_SPEED, weight);
 		else if(mode == BUS)
-			return time_calculator(BUS_RATIO, weight);
+			return time(BUS_SPEED, weight);
 	case 3:
 		if (same_zone(_loader._stops[start], _loader._stops[end]))
 			return NO_PENALTY;

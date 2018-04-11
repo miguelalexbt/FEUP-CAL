@@ -36,13 +36,13 @@ void Line::addRoute(vector<route_t> route, int dir) {
 		_routeD = route;
 }
 
-void to_json(json &j, const Line &s) {
-	j = json{ { "code", s._lcode },{ "mode", s._mode },{ "routeA", s._routeA },{ "routeD", s._routeD } };
+void to_json(json &j, const Line &l) {
+	j = json{ { "code", l._lcode },{ "mode", l._mode },{ "routeA", l._routeA },{ "routeD", l._routeD } };
 }
 
-void from_json(const json &j, Line &s) {
-	s._lcode = j.at("code").get<string>();
-	s._mode = j.at("mode").get<mode_t>();
-	s._routeA = j.at("routeA").get<vector<route_t>>();
-	s._routeD = j.at("routeD").get<vector<route_t>>();
+void from_json(const json &j, Line &l) {
+	l._lcode = j.at("code").get<string>();
+	l._mode = j.at("mode").get<mode_t>();
+	l._routeA = j.at("routeA").get<vector<route_t>>();
+	l._routeD = j.at("routeD").get<vector<route_t>>();
 }
