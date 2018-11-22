@@ -1,5 +1,5 @@
 
-#include "trip_planner/core/menu/default_behavior.h"
+#include "trip_planner/core/menu/default_behaviour.h"
 
 using namespace std;
 
