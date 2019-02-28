@@ -2,7 +2,7 @@
 A multimodal route planner, capable of identifying the best combination of transport modes to make a journey from a point of origin to the intended point of destination.
 
 ## Installing:
-This project requires 3 dependencies: [libcurl](https://curl.haxx.se/libcurl), [cpr](http://whoshuu.github.io/cpr) and
+This project requires 2 dependencies: [libcurl](https://curl.haxx.se/libcurl) and
 [nlohmann-json](https://github.com/nlohmann/json). It's recommended to install them through [vcpkg](https://github.com/Microsoft/vcpkg), for its
 simplicity.
 
