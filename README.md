@@ -9,9 +9,6 @@ simplicity.
 ## Usage:
 $ <.exe> STOP1 STOP2 -ARG
 
-## Documentation:
-Documentation is available [here](https://miguelalexbt.github.io/2CAL-TripPlanner).
-
 ## Work done by:
 - Miguel Teixeira ([@miguelalexbt](https://github.com/miguelalexbt))
 - Pedro Pinho ([@Rockdell](https://github.com/Rockdell))
